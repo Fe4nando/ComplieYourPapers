@@ -11,12 +11,41 @@ from reportlab.lib.utils import ImageReader
 from PIL import Image, ImageDraw, ImageFont
 from dictionary import *
 import os
+import json
+from datetime import datetime
 
+# ============ Streamlit App Setup ============
+st.set_page_config(page_title="PaperPort Web", page_icon="📘")
+st.title("CAIE Paper Downloader (ALPHA)")
 
-st.set_page_config(page_title="PaperPilot Web", page_icon="📘")
-st.title("📘 Past Paper Downloader (BETA)")
+# ============ Load or Create Data Tracker ============
+DATA_FILE = "data.json"
 
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, "w") as f:
+        json.dump({"total_downloads": 0, "logs": []}, f, indent=4)
 
+def update_data_log(level, subject_name, subject_code, num_papers, success_count, fail_count):
+    """Update data.json with download event"""
+    with open(DATA_FILE, "r") as f:
+        data = json.load(f)
+
+    data["total_downloads"] = data.get("total_downloads", 0) + 1
+    log_entry = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "level": level,
+        "subject_name": subject_name,
+        "subject_code": subject_code,
+        "papers_selected": num_papers,
+        "success": success_count,
+        "failed": fail_count
+    }
+    data["logs"].append(log_entry)
+
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+# ============ UI Inputs ============
 level_choice = st.radio("Select Level:", ["IGCSE", "A Level"], horizontal=True)
 
 subjects = IGCSE_SUBJECTS if level_choice == "IGCSE" else ALEVEL_SUBJECTS
@@ -25,14 +54,12 @@ subject_code = subjects[subject_name]
 
 st.info(f"📘 Selected: **{subject_name}**  |  Code: `{subject_code}`")
 
-
 alias_name = ""
 if len(subject_name) > 16:
     alias_name = st.text_input(
         "✏️ Alias for Cover (Short Name)",
         placeholder="Enter a shorter name for the cover page"
     )
-
 
 col1, col2 = st.columns(2)
 with col1:
@@ -43,22 +70,18 @@ with col2:
 sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["s", "w"])
 paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)"])
 
-
 paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "11 12 13")
-
 
 st.markdown("### 🖼️ Upload a Cover Image (PNG) — or leave empty to use `template_base.png`")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
 
-
+# ============ Cover Generator ============
 def generate_cover_page(level_code, subject_code, subject_name, alias_name, paper_id, output_folder, uploaded_image_path=None):
-    """Generate a front cover page PDF with GEMS layout style"""
     TEMPLATE_PATH = os.path.join(os.getcwd(), "template_base.png")
     image_path_to_use = uploaded_image_path if uploaded_image_path else TEMPLATE_PATH
     if not os.path.exists(image_path_to_use):
         st.warning("⚠️ No cover image found. Skipping cover generation.")
         return None
-
 
     image = Image.open(image_path_to_use).convert("RGB")
     draw = ImageDraw.Draw(image)
@@ -69,7 +92,6 @@ def generate_cover_page(level_code, subject_code, subject_name, alias_name, pape
     except:
         font_large = ImageFont.load_default()
         font_medium = ImageFont.load_default()
-
 
     x_pos = 152
     y_start = 440
@@ -104,7 +126,7 @@ def generate_cover_page(level_code, subject_code, subject_name, alias_name, pape
 
     return pdf_path
 
-
+# ============ Helper: Format Papers ============
 def format_papers(text):
     cleaned = re.sub(r"\D", "", text)
     groups = [cleaned[i:i+2] for i in range(0, len(cleaned), 2)]
@@ -113,6 +135,7 @@ def format_papers(text):
 paper_input = format_papers(paper_input_raw)
 paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
 
+# ============ Paper Chips ============
 chip_style = """
 <style>
 .paper-chip {
@@ -139,7 +162,7 @@ if paper_numbers:
     ) + "</div>"
     st.markdown(chips_html, unsafe_allow_html=True)
 
-
+# ============ Downloader ============
 def download_paper(args):
     subject_code, session, year_suffix, paper_type_short, paper_no = args
     filename = f"{subject_code}_{session}{year_suffix}_{paper_type_short}_{paper_no}.pdf"
@@ -153,7 +176,7 @@ def download_paper(args):
     except Exception:
         return paper_no, filename, None
 
-
+# ============ Main Action ============
 if st.button("⚡ Download & Merge Papers"):
     if not paper_numbers:
         st.error("Please enter at least one paper number.")
@@ -213,20 +236,15 @@ if st.button("⚡ Download & Merge Papers"):
                 if cover_pdf:
                     final_merger.append(cover_pdf)
 
-                # Append all downloaded papers
                 for b in pdf_list:
                     b.seek(0)
                     final_merger.append(b)
 
-                # ✅ Append end.pdf if it exists
+                # Add end.pdf (if exists)
                 end_pdf_path = os.path.join(os.getcwd(), "end.pdf")
                 if os.path.exists(end_pdf_path):
-                    with open(end_pdf_path, "rb") as end_pdf:
-                        final_merger.append(end_pdf)
-                else:
-                    st.warning("⚠️ end.pdf not found — skipping end page for this file.")
+                    final_merger.append(end_pdf_path)
 
-                # Write merged file
                 merged_pdf = BytesIO()
                 final_merger.write(merged_pdf)
                 final_merger.close()
@@ -237,6 +255,9 @@ if st.button("⚡ Download & Merge Papers"):
 
         output_zip.seek(0)
         zip_name = f"{level_choice}_{subject_code}_merged_papers.zip"
+
+        # ✅ Update tracker
+        update_data_log(level_choice, subject_name, subject_code, len(paper_numbers), len(downloaded), len(failed))
 
         st.success(f"✅ Downloaded {len(downloaded)} papers. {len(failed)} failed.")
         st.download_button(

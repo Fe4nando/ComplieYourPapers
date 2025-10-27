@@ -1,0 +1,23 @@
+{
+    "total_downloads": 2,
+    "logs": [
+        {
+            "timestamp": "2025-10-27 19:58:40",
+            "level": "IGCSE",
+            "subject_name": "Accounting",
+            "subject_code": "0452",
+            "papers_selected": 3,
+            "success": 15,
+            "failed": 3
+        },
+        {
+            "timestamp": "2025-10-27 19:59:12",
+            "level": "A Level",
+            "subject_name": "Computer-Science",
+            "subject_code": "9618",
+            "papers_selected": 3,
+            "success": 21,
+            "failed": 3
+        }
+    ]
+}
