@@ -15,7 +15,7 @@ import json
 from datetime import datetime
 
 # ============ Streamlit App Setup ============
-st.set_page_config(page_title="PaperPort Web", page_icon="🎓")
+st.set_page_config(page_title="PaperPort Web", page_icon="🎓",  layout="wide" )
 
 # --- Logo + Title (Top-Left) ---
 st.markdown("""
