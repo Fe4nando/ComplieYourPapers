@@ -100,7 +100,7 @@ if len(subject_name) > 16:
         "✏️ Alias for Cover (Short Name)",
         placeholder="Enter a shorter name for the cover page"
     )
-current_year = datetime.now().year
+current_year = int(datetime.now().year)
 col1, col2 = st.columns(2)
 with col1:
     year_start = st.number_input("Start Year", min_value=2002, max_value=current_year, value=current_year-5)
@@ -316,5 +316,6 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
