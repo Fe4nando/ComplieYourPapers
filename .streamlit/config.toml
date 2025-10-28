@@ -1,1 +1,6 @@
-
+[theme]
+base="light"
+primaryColor="#b38728"
+textColor="#0a1d4e"
+[ui]
+wideMode = true
