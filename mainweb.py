@@ -110,7 +110,7 @@ with col2:
 sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["s", "w"])
 paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)","in (Insert)"])
 
-paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "11 12 13")
+paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "12 22 32 42")
 
 st.markdown("### Optional:Upload a Cover Image (PNG)")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
@@ -316,6 +316,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
