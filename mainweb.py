@@ -9,10 +9,23 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from PIL import Image, ImageDraw, ImageFont
-from dictionary import *
 import os
 import json
 from datetime import datetime
+
+LEVELS = st.secrets["LEVELS"]
+DOWNLOAD_DIR = st.secrets["DOWNLOAD_DIR"]
+HEADERS = json.loads(st.secrets["HEADERS"])
+SESSIONS_ALL = st.secrets["SESSIONS_ALL"]
+
+# Load large subject dictionaries from JSON
+IGCSE_SUBJECTS = json.loads(st.secrets["IGCSE_SUBJECTS"])
+ALEVEL_SUBJECTS = json.loads(st.secrets["ALEVEL_SUBJECTS"])
+
+ALL_SUBJECTS = {
+    "IGCSE": sorted(IGCSE_SUBJECTS.keys()),
+    "A-Level": sorted(ALEVEL_SUBJECTS.keys())
+}
 
 # ============ Streamlit App Setup ============
 st.set_page_config(page_title="PaperPort Web", page_icon="🎓",  layout="wide" )
@@ -303,3 +316,4 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
