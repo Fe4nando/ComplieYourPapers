@@ -112,7 +112,7 @@ paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme
 
 paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "11 12 13")
 
-st.markdown("### 🖼️ Upload a Cover Image (PNG) — or leave empty to use `template_base.png`")
+st.markdown("### Optional:Upload a Cover Image (PNG)")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
 
 # ============ Cover Generator ============
@@ -316,6 +316,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
