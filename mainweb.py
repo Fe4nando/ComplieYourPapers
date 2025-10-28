@@ -15,8 +15,35 @@ import json
 from datetime import datetime
 
 # ============ Streamlit App Setup ============
-st.set_page_config(page_title="PaperPort Web", page_icon="📘")
-st.title("CAIE Paper Downloader (ALPHA)")
+st.set_page_config(page_title="PaperPort Web", page_icon="🎓")
+
+# --- Logo + Title (Top-Left) ---
+st.markdown("""
+    <style>
+    .logo-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* left align; use center for centered version */
+        margin-bottom: -10px;
+    }
+    .logo-container img {
+        height: 80px;
+        margin-bottom: 10px;
+    }
+    .logo-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0A1D4E;
+        font-family: 'Poppins', sans-serif;
+    }
+    </style>
+    <div class="logo-container">
+        <img src="https://raw.githubusercontent.com/Fe4nando/ComplieYourPapers/main/logo.png" alt="Logo">
+        <div class="logo-title">Past Paper Downloader and Merger (Early Access)</div>
+    </div>
+""", unsafe_allow_html=True)
+
+st.write("")
 
 # ============ Load or Create Data Tracker ============
 DATA_FILE = "data.json"
@@ -217,7 +244,7 @@ if st.button("⚡ Download & Merge Papers"):
                     status_lines.append(f"✅ {filename}")
                 else:
                     failed.append(filename)
-                    status_lines.append(f"⚠️ Unable to download {filename}")
+                    status_lines.append(f"⚠️This Paper isnt Available Or Not Yet released {filename}")
                 completed += 1
                 progress.progress(completed / total_tasks)
                 status_placeholder.markdown("<br>".join(status_lines[-15:]), unsafe_allow_html=True)
@@ -270,3 +297,9 @@ if st.button("⚡ Download & Merge Papers"):
         if failed:
             with st.expander("⚠️ Show Failed Downloads"):
                 st.write("\n".join(failed))
+st.markdown("""
+    <hr style="margin-top: 50px; border: none; height: 1px; background-color: #333;">
+    <div style='text-align: center; font-size: 0.8rem; color: #888; padding-bottom: 20px;'>
+        © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
+    </div>
+""", unsafe_allow_html=True)
