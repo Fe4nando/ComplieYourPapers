@@ -107,7 +107,7 @@ with col1:
 with col2:
     year_end = st.number_input("End Year", min_value=2002, max_value=current_year, value=current_year)
 
-sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["s", "w"])
+sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["m", "s","w"])
 paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)","in (Insert)"])
 
 paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "12 22 32 42")
@@ -316,6 +316,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
