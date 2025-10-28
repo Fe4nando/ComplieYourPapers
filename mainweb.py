@@ -18,7 +18,6 @@ DOWNLOAD_DIR = st.secrets["DOWNLOAD_DIR"]
 HEADERS = json.loads(st.secrets["HEADERS"])
 SESSIONS_ALL = st.secrets["SESSIONS_ALL"]
 
-# Load large subject dictionaries from JSON
 IGCSE_SUBJECTS = json.loads(st.secrets["IGCSE_SUBJECTS"])
 ALEVEL_SUBJECTS = json.loads(st.secrets["ALEVEL_SUBJECTS"])
 
@@ -27,10 +26,8 @@ ALL_SUBJECTS = {
     "A-Level": sorted(ALEVEL_SUBJECTS.keys())
 }
 
-# ============ Streamlit App Setup ============
 st.set_page_config(page_title="PaperPort Web", page_icon="🎓",  layout="wide" )
 
-# --- Logo + Title (Top-Left) ---
 st.markdown("""
     <style>
     .logo-container {
@@ -58,7 +55,6 @@ st.markdown("""
 
 st.write("")
 
-# ============ Load or Create Data Tracker ============
 DATA_FILE = "data.json"
 
 if not os.path.exists(DATA_FILE):
@@ -85,7 +81,6 @@ def update_data_log(level, subject_name, subject_code, num_papers, success_count
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-# ============ UI Inputs ============
 level_choice = st.radio("Select Level:", ["IGCSE", "A Level"], horizontal=True)
 
 subjects = IGCSE_SUBJECTS if level_choice == "IGCSE" else ALEVEL_SUBJECTS
@@ -115,7 +110,6 @@ paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "12
 st.markdown("### Optional:Upload a Cover Image (PNG)")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
 
-# ============ Cover Generator ============
 def generate_cover_page(level_code, subject_code, subject_name, alias_name, paper_id, output_folder, uploaded_image_path=None):
     TEMPLATE_PATH = os.path.join(os.getcwd(), "template_base.png")
     image_path_to_use = uploaded_image_path if uploaded_image_path else TEMPLATE_PATH
@@ -166,7 +160,6 @@ def generate_cover_page(level_code, subject_code, subject_name, alias_name, pape
 
     return pdf_path
 
-# ============ Helper: Format Papers ============
 def format_papers(text):
     cleaned = re.sub(r"\D", "", text)
     groups = [cleaned[i:i+2] for i in range(0, len(cleaned), 2)]
@@ -175,7 +168,6 @@ def format_papers(text):
 paper_input = format_papers(paper_input_raw)
 paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
 
-# ============ Paper Chips ============
 chip_style = """
 <style>
 .paper-chip {
@@ -202,7 +194,6 @@ if paper_numbers:
     ) + "</div>"
     st.markdown(chips_html, unsafe_allow_html=True)
 
-# ============ Downloader ============
 def download_paper(args):
     subject_code, session, year_suffix, paper_type_short, paper_no = args
     filename = f"{subject_code}_{session}{year_suffix}_{paper_type_short}_{paper_no}.pdf"
@@ -216,7 +207,6 @@ def download_paper(args):
     except Exception:
         return paper_no, filename, None
 
-# ============ Main Action ============
 if st.button("⚡ Download & Merge Papers"):
     if not paper_numbers:
         st.error("Please enter at least one paper number.")
@@ -280,7 +270,7 @@ if st.button("⚡ Download & Merge Papers"):
                     b.seek(0)
                     final_merger.append(b)
 
-                # Add end.pdf (if exists)
+            
                 end_pdf_path = os.path.join(os.getcwd(), "end.pdf")
                 if os.path.exists(end_pdf_path):
                     final_merger.append(end_pdf_path)
@@ -296,7 +286,7 @@ if st.button("⚡ Download & Merge Papers"):
         output_zip.seek(0)
         zip_name = f"{level_choice}_{subject_code}_merged_papers.zip"
 
-        # ✅ Update tracker
+   
         update_data_log(level_choice, subject_name, subject_code, len(paper_numbers), len(downloaded), len(failed))
 
         st.success(f"✅ Downloaded {len(downloaded)} papers. {len(failed)} failed.")
@@ -316,6 +306,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
