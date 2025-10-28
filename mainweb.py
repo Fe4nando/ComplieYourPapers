@@ -105,7 +105,7 @@ col1, col2 = st.columns(2)
 with col1:
     year_start = st.number_input("Start Year", min_value=2002, max_value=current_year, value=current_year-5)
 with col2:
-    year_end = st.number_input("End Year", min_value=2002, max_value=current_year, value=currect_year)
+    year_end = st.number_input("End Year", min_value=2002, max_value=current_year, value=current_year)
 
 sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["s", "w"])
 paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)","in (Insert)"])
@@ -316,6 +316,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
