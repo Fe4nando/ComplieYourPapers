@@ -95,7 +95,7 @@ with col2:
     year_end = st.number_input("End Year", min_value=2000, max_value=2030, value=2025)
 
 sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["s", "w"])
-paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)"])
+paper_type = st.selectbox("Paper Type", ["qp (Question Paper)", "ms (Mark Scheme)","in (Insert)"])
 
 paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 1236 or 011213)", "11 12 13")
 
