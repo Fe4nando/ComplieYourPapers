@@ -92,7 +92,7 @@ subjects = IGCSE_SUBJECTS if level_choice == "IGCSE" else ALEVEL_SUBJECTS
 subject_name = st.selectbox("Select Subject", sorted(subjects.keys()))
 subject_code = subjects[subject_name]
 
-st.info(f"📘 Selected: **{subject_name}**  |  Code: `{subject_code}`")
+st.info(f"Selected: **{subject_name}**  |  Code: `{subject_code}`")
 
 alias_name = ""
 if len(subject_name) > 16:
@@ -316,6 +316,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
