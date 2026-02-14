@@ -179,7 +179,7 @@ if st.button("⚡ Download & Merge Papers"):
         downloaded, failed = [], []
 
         uploaded_cover_path = None
-        if cover_image:
+        if cover_image is not None:
             uploaded_cover_path = os.path.join(os.getcwd(), "uploaded_cover.png")
             with open(uploaded_cover_path, "wb") as f:
                 f.write(cover_image.read())
@@ -305,6 +305,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
