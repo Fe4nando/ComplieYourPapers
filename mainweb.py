@@ -278,9 +278,10 @@ if st.button("⚡ Download & Merge Papers"):
 st.markdown("""
     <hr style="margin-top: 50px; border: none; height: 1px; background-color: #333;">
     <div style='text-align: center; font-size: 0.8rem; color: #888; padding-bottom: 20px;'>
-        © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
+        © 2026 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
