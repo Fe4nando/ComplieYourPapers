@@ -50,7 +50,7 @@ st.markdown("""
 </style>
 <div class="logo-container">
     <img src="https://raw.githubusercontent.com/Fe4nando/ComplieYourPapers/main/logo.png">
-    <div class="logo-title">Past Paper Downloader and Merger (Early Access)</div>
+    <div class="logo-title">Past Paper Downloader and Merger </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -281,6 +281,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
