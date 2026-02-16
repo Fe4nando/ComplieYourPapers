@@ -28,9 +28,6 @@ ALL_SUBJECTS = {
 
 st.set_page_config(page_title="PaperPort Web", page_icon="🎓", layout="wide")
 
-# =========================
-# HEADER
-# =========================
 
 st.markdown("""
 <style>
@@ -59,9 +56,6 @@ st.markdown("""
 
 st.write("")
 
-# =========================
-# DATA FILE
-# =========================
 
 DATA_FILE = "data.json"
 
@@ -90,9 +84,7 @@ def update_data_log(level, subject_name, subject_code, num_papers, success_count
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-# =========================
-# USER INPUT
-# =========================
+
 
 level_choice = st.radio("Select Level:", ["IGCSE", "A Level"], horizontal=True)
 
@@ -117,9 +109,6 @@ with col2:
 
 sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["m", "s", "w"])
 
-# =========================
-# PAPER TYPE (GT ADDED)
-# =========================
 
 paper_type = st.selectbox(
     "Paper Type",
@@ -141,16 +130,11 @@ def format_papers(text):
 paper_input = format_papers(paper_input_raw)
 paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
 
-# =========================
-# COVER UPLOAD
-# =========================
 
 st.markdown("### Optional: Upload a Cover Image (PNG)")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
 
-# =========================
-# DOWNLOAD FUNCTION
-# =========================
+
 
 def download_paper(args):
     subject_code, session, year_suffix, paper_type_short, paper_no = args
@@ -171,9 +155,7 @@ def download_paper(args):
     except:
         return paper_no, filename, None
 
-# =========================
-# BUTTON LOGIC
-# =========================
+
 
 if st.button("⚡ Download & Merge Papers"):
 
@@ -299,6 +281,7 @@ st.markdown("""
         © 2025 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
 
 
 
