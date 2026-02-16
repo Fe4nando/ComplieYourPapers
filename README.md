@@ -34,13 +34,21 @@ Project Structure
     	│── README.md
 
 Features
-Download IGCSE and A-Level past papers
-Select Question Paper or Marking Scheme
-Choose start year and number of past years
-Merge papers by paper code (11, 12, 21, etc.)
-Optional custom cover page generation
-Multithreaded downloading for improved speed
-Interactive web interface
+
+    Download IGCSE and A-Level past papers
+  
+    Select Question Paper or Marking Scheme
+  
+    Choose start year and number of past years
+  
+    Merge papers by paper code (11, 12, 21, etc.)
+  
+    Optional custom cover page generation
+  
+    Multithreaded downloading for improved speed
+    
+    Interactive web interface
 
 Author
+
 Fernando Gabriel Morera
