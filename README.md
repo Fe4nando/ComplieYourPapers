@@ -17,6 +17,22 @@ Run:
 streamlit run app.py
 Open the local browser link provided (usually http://localhost:8501)
 
+Project Structure
+  
+    PaperPilot/
+    	│── mainweb.py
+    	│── requirements.txt
+    	│── config.toml
+    	│── data.json
+    	│── template_base.png
+    	│── end.pdf
+    	│── logo.png
+    	│── Poppins-Bold.ttf
+    	│── .streamlit/
+    	│── .devcontainer/
+    	│── LICENSE
+    	│── README.md
+
 Features
 Download IGCSE and A-Level past papers
 Select Question Paper or Marking Scheme
