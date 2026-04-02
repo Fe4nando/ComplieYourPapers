@@ -159,19 +159,19 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     # Position generated text inside the large white content box from the template.
     left_margin = 78
-    text_top = 690
-    line_gap = 52
+    text_top = 590
+    line_gap = 48
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 25)
+    cover.setFont(COVER_FONT_NAME, 26)
     cover.drawString(left_margin, text_top, heading[:28])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 28)
-    cover.drawString(left_margin, text_top - line_gap, subtitle)
+    cover.setFont(COVER_FONT_NAME, 26)
+    cover.drawString(left_margin, text_top - line_gap, title[:30])
 
-    cover.setFont(COVER_FONT_NAME, 23)
-    cover.drawString(left_margin, text_top - (line_gap * 2), title[:30])
+    cover.setFont(COVER_FONT_NAME, 20)
+    cover.drawString(left_margin, text_top - (line_gap * 2), subtitle[:32])
 
     cover.showPage()
     cover.save()
