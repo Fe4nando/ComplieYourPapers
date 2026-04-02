@@ -144,21 +144,21 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     # Position generated text inside the large white content box from the template.
     left_margin = 78
-    text_top = 560
-    line_gap = 30
+    text_top = 590
+    line_gap = 34
 
-    cover.setFillColor(HexColor("#0A1D4E"))
-    cover.setFont(COVER_FONT_NAME, 28)
+    cover.setFillColor(HexColor("#000000"))
+    cover.setFont(COVER_FONT_NAME, 32)
     cover.drawString(left_margin, text_top, title[:34])
 
-    cover.setFillColor(HexColor("#1F1F1F"))
-    cover.setFont(COVER_FONT_NAME, 18)
+    cover.setFillColor(HexColor("#000000"))
+    cover.setFont(COVER_FONT_NAME, 21)
     cover.drawString(left_margin, text_top - line_gap, subtitle)
 
-    cover.setFont(COVER_FONT_NAME, 15)
+    cover.setFont(COVER_FONT_NAME, 17)
     cover.drawString(left_margin, text_top - (line_gap * 2), f"{level} | Subject Code: {subject_code}")
 
-    cover.setFont(COVER_FONT_NAME, 12)
+    cover.setFont(COVER_FONT_NAME, 14)
     cover.drawString(left_margin, text_top - (line_gap * 3), f"Generated on {datetime.now().strftime('%d %b %Y')}")
 
     cover.showPage()
