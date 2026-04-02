@@ -3,6 +3,7 @@ import requests
 from PyPDF2 import PdfMerger
 from io import BytesIO
 import zipfile
+import base64
 import re
 import concurrent.futures
 from reportlab.pdfgen import canvas
@@ -15,6 +16,7 @@ from PIL import Image
 import os
 import json
 from datetime import datetime
+import streamlit.components.v1 as components
 
 LEVELS = st.secrets["LEVELS"]
 DOWNLOAD_DIR = st.secrets["DOWNLOAD_DIR"]
@@ -113,18 +115,20 @@ COVER_FONT_NAME = register_cover_font()
 
 def build_cover_title(subject_name, alias_name, paper_type_short, paper_no, level, subject_code):
     display_name = alias_name.strip() if alias_name.strip() else subject_name
+    heading_level = "A-LEVEL" if level == "A Level" else "IGCSE"
+    heading = f"{heading_level} {subject_code}"
     if paper_type_short == "gt":
-        paper_line = "Grade Thresholds"
+        paper_line = "GRADE THRESHOLDS"
     else:
         paper_labels = {
-            "qp": "Question Paper",
-            "ms": "Mark Scheme",
-            "in": "Insert",
+            "qp": "QUESTION PAPER",
+            "ms": "MARK SCHEME",
+            "in": "INSERT",
         }
         paper_label = paper_labels.get(paper_type_short, paper_type_short.upper())
         paper_line = f"{paper_label} {paper_no}"
 
-    return display_name, paper_line, level, subject_code
+    return heading, display_name.upper(), paper_line
 
 
 def create_cover_pdf(background_path, level, subject_name, alias_name, subject_code, paper_type_short, paper_no):
@@ -156,25 +160,24 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     cover.drawImage(ImageReader(background_path), x, y, width=draw_width, height=draw_height, preserveAspectRatio=True)
 
-    title, paper_line, cover_level, cover_subject_code = build_cover_title(
+    heading, title, paper_line = build_cover_title(
         subject_name, alias_name, paper_type_short, paper_no, level, subject_code
     )
 
     left_margin = 78
-    title_y = 560
-    line_gap = 40
+    title_y = 620
+    line_gap = 64
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 32)
-    cover.drawString(left_margin, title_y, title[:24])
+    cover.setFont(COVER_FONT_NAME, 28)
+    cover.drawString(left_margin, title_y, heading[:24])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 22)
-    cover.drawString(left_margin, title_y - line_gap, paper_line[:28])
+    cover.setFont(COVER_FONT_NAME, 36)
+    cover.drawString(left_margin, title_y - line_gap, title[:22])
 
-    cover.setFont(COVER_FONT_NAME, 16)
-    cover.drawString(left_margin, title_y - (line_gap * 2), f"Level: {cover_level}")
-    cover.drawString(left_margin, title_y - (line_gap * 2.8), f"Subject Code: {cover_subject_code}")
+    cover.setFont(COVER_FONT_NAME, 24)
+    cover.drawString(left_margin, title_y - (line_gap * 2), paper_line[:24])
 
     cover.showPage()
     cover.save()
@@ -206,12 +209,16 @@ selected_session_labels = st.multiselect("Select Sessions", session_labels, defa
 sessions = [SESSION_OPTIONS[label] for label in selected_session_labels]
 
 
-paper_type = st.selectbox(
-    "Paper Type",
-    ["qp (Question Paper)", "ms (Mark Scheme)", "in (Insert)", "gt (Grade Thresholds)"]
-)
+PAPER_TYPE_OPTIONS = {
+    "Question Paper": "qp",
+    "Mark Scheme": "ms",
+    "Insert": "in",
+    "Grade Thresholds": "gt",
+}
 
-paper_type_short = paper_type.split(" ")[0]
+paper_type = st.selectbox("Paper Type", list(PAPER_TYPE_OPTIONS.keys()))
+
+paper_type_short = PAPER_TYPE_OPTIONS[paper_type]
 
 if paper_type_short != "gt":
     paper_input_raw = st.text_input("Enter Paper Numbers (e.g. 12 22 32)", "12 22 32 42")
@@ -387,12 +394,23 @@ if st.button("Download & Merge Papers"):
             st.stop()
 
         st.success(f"Downloaded {len(downloaded)} papers. {len(failed)} failed.")
-
-        st.download_button(
-            "Download All Merged Files (ZIP)",
-            output_zip.getvalue(),
-            f"{level_choice}_{subject_code}_merged_papers.zip",
-            "application/zip"
+        zip_filename = f"{level_choice}_{subject_code}_merged_papers.zip"
+        zip_b64 = base64.b64encode(output_zip.getvalue()).decode()
+        components.html(
+            f"""
+            <script>
+            const link = document.createElement('a');
+            link.href = "data:application/zip;base64,{zip_b64}";
+            link.download = "{zip_filename}";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            </script>
+            <p style="font-family: sans-serif; color: #666; margin: 0;">
+                Your ZIP download should start automatically.
+            </p>
+            """,
+            height=28,
         )
 
 st.markdown("""
