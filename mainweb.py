@@ -8,7 +8,10 @@ import concurrent.futures
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
-from PIL import Image, ImageDraw, ImageFont
+from reportlab.lib.colors import HexColor, white
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from PIL import Image
 import os
 import json
 from datetime import datetime
@@ -58,6 +61,9 @@ st.write("")
 
 
 DATA_FILE = "data.json"
+DEFAULT_TEMPLATE_PATH = "template_base.png"
+DEFAULT_END_PAGE_PATH = "end.pdf"
+DEFAULT_FONT_PATH = "Poppins-Bold.ttf"
 
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
@@ -83,6 +89,77 @@ def update_data_log(level, subject_name, subject_code, num_papers, success_count
 
     with open(DATA_FILE, "w") as f:
         json.dump(data, f, indent=4)
+
+
+def register_cover_font():
+    if os.path.exists(DEFAULT_FONT_PATH):
+        try:
+            pdfmetrics.registerFont(TTFont("PoppinsBold", DEFAULT_FONT_PATH))
+            return "PoppinsBold"
+        except Exception:
+            pass
+    return "Helvetica-Bold"
+
+
+COVER_FONT_NAME = register_cover_font()
+
+
+def build_cover_title(subject_name, alias_name, paper_type_short, paper_no):
+    display_name = alias_name.strip() if alias_name.strip() else subject_name
+    subtitle = "Grade Thresholds" if paper_type_short == "gt" else f"{paper_type_short.upper()} Paper {paper_no}"
+    return display_name, subtitle
+
+
+def create_cover_pdf(background_path, level, subject_name, alias_name, subject_code, paper_type_short, paper_no):
+    if not background_path or not os.path.exists(background_path):
+        return None
+
+    packet = BytesIO()
+    page_width, page_height = A4
+    cover = canvas.Canvas(packet, pagesize=A4)
+
+    try:
+        with Image.open(background_path) as img:
+            img_width, img_height = img.size
+    except Exception:
+        return None
+
+    page_ratio = page_width / page_height
+    image_ratio = img_width / img_height if img_height else page_ratio
+
+    if image_ratio > page_ratio:
+        draw_height = page_height
+        draw_width = draw_height * image_ratio
+    else:
+        draw_width = page_width
+        draw_height = draw_width / image_ratio if image_ratio else page_height
+
+    x = (page_width - draw_width) / 2
+    y = (page_height - draw_height) / 2
+
+    cover.drawImage(ImageReader(background_path), x, y, width=draw_width, height=draw_height, preserveAspectRatio=True)
+
+    title, subtitle = build_cover_title(subject_name, alias_name, paper_type_short, paper_no)
+    cover.setFillColor(HexColor("#0A1D4E"))
+    cover.roundRect(45, 85, page_width - 90, 180, fill=1, stroke=0)
+
+    cover.setFillColor(white)
+    cover.setFont(COVER_FONT_NAME, 26)
+    cover.drawString(65, 220, title[:38])
+
+    cover.setFont(COVER_FONT_NAME, 18)
+    cover.drawString(65, 190, subtitle)
+
+    cover.setFont(COVER_FONT_NAME, 14)
+    cover.drawString(65, 160, f"{level} | Subject Code: {subject_code}")
+
+    cover.setFont(COVER_FONT_NAME, 12)
+    cover.drawString(65, 135, f"Generated on {datetime.now().strftime('%d %b %Y')}")
+
+    cover.showPage()
+    cover.save()
+    packet.seek(0)
+    return packet
 
 
 
@@ -184,6 +261,8 @@ if st.button("⚡ Download & Merge Papers"):
             with open(uploaded_cover_path, "wb") as f:
                 f.write(cover_image.read())
 
+        background_path = uploaded_cover_path if uploaded_cover_path else DEFAULT_TEMPLATE_PATH
+
         st.write("### 📥 Download Progress:")
         status_placeholder = st.empty()
         progress = st.progress(0)
@@ -209,6 +288,7 @@ if st.button("⚡ Download & Merge Papers"):
 
                 completed += 1
                 progress.progress(completed / total_tasks)
+                status_placeholder.caption(f"Processed {completed}/{total_tasks} files")
 
         output_zip = BytesIO()
 
@@ -218,9 +298,22 @@ if st.button("⚡ Download & Merge Papers"):
 
                 if gt_downloads:
                     merger = PdfMerger()
+                    cover_pdf = create_cover_pdf(
+                        background_path,
+                        level_choice,
+                        subject_name,
+                        alias_name,
+                        subject_code,
+                        paper_type_short,
+                        None
+                    )
+                    if cover_pdf:
+                        merger.append(cover_pdf)
                     for pdf in gt_downloads:
                         pdf.seek(0)
                         merger.append(pdf)
+                    if os.path.exists(DEFAULT_END_PAGE_PATH):
+                        merger.append(DEFAULT_END_PAGE_PATH)
 
                     merged_pdf = BytesIO()
                     merger.write(merged_pdf)
@@ -240,10 +333,24 @@ if st.button("⚡ Download & Merge Papers"):
                         continue
 
                     merger = PdfMerger()
+                    cover_pdf = create_cover_pdf(
+                        background_path,
+                        level_choice,
+                        subject_name,
+                        alias_name,
+                        subject_code,
+                        paper_type_short,
+                        num
+                    )
+                    if cover_pdf:
+                        merger.append(cover_pdf)
 
                     for b in pdf_list:
                         b.seek(0)
                         merger.append(b)
+
+                    if os.path.exists(DEFAULT_END_PAGE_PATH):
+                        merger.append(DEFAULT_END_PAGE_PATH)
 
                     merged_pdf = BytesIO()
                     merger.write(merged_pdf)
@@ -266,6 +373,10 @@ if st.button("⚡ Download & Merge Papers"):
             len(failed)
         )
 
+        if not downloaded:
+            st.warning("No valid PDFs were downloaded, so no merged files were created.")
+            st.stop()
+
         st.success(f"Downloaded {len(downloaded)} papers. {len(failed)} failed.")
 
         st.download_button(
@@ -281,18 +392,3 @@ st.markdown("""
         © 2026 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
