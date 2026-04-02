@@ -29,6 +29,12 @@ ALL_SUBJECTS = {
     "A-Level": sorted(ALEVEL_SUBJECTS.keys())
 }
 
+SESSION_OPTIONS = {
+    "FEB/MAR": "m",
+    "MAY/JUN": "s",
+    "OCT/NOV": "w",
+}
+
 st.set_page_config(page_title="PaperPort Web", page_icon="🎓", layout="wide")
 
 
@@ -107,21 +113,18 @@ COVER_FONT_NAME = register_cover_font()
 
 def build_cover_title(subject_name, alias_name, paper_type_short, paper_no, level, subject_code):
     display_name = alias_name.strip() if alias_name.strip() else subject_name
-    heading_level = "A-LEVEL" if level == "A Level" else "IGCSE"
-    heading = f"{heading_level} {subject_code}"
-
     if paper_type_short == "gt":
-        paper_line = "GRADE THRESHOLDS"
+        paper_line = "Grade Thresholds"
     else:
         paper_labels = {
-            "qp": "QUESTION PAPER",
-            "ms": "MARK SCHEME",
-            "in": "INSERT",
+            "qp": "Question Paper",
+            "ms": "Mark Scheme",
+            "in": "Insert",
         }
         paper_label = paper_labels.get(paper_type_short, paper_type_short.upper())
         paper_line = f"{paper_label} {paper_no}"
 
-    return heading, display_name.upper(), paper_line
+    return display_name, paper_line, level, subject_code
 
 
 def create_cover_pdf(background_path, level, subject_name, alias_name, subject_code, paper_type_short, paper_no):
@@ -153,25 +156,24 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     cover.drawImage(ImageReader(background_path), x, y, width=draw_width, height=draw_height, preserveAspectRatio=True)
 
-    heading, title, subtitle = build_cover_title(
+    title, paper_line, cover_level, cover_subject_code = build_cover_title(
         subject_name, alias_name, paper_type_short, paper_no, level, subject_code
     )
 
-    # Position generated text inside the large white content box from the template.
     left_margin = 78
-    text_top = 590
-    line_gap = 48
+    title_y = 548
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 26)
-    cover.drawString(left_margin, text_top, heading[:28])
+    cover.setFont(COVER_FONT_NAME, 30)
+    cover.drawString(left_margin, title_y, title[:24])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 26)
-    cover.drawString(left_margin, text_top - line_gap, title[:30])
-
     cover.setFont(COVER_FONT_NAME, 20)
-    cover.drawString(left_margin, text_top - (line_gap * 2), subtitle[:32])
+    cover.drawString(left_margin, title_y - 42, paper_line[:28])
+
+    cover.setFont(COVER_FONT_NAME, 14)
+    cover.drawString(left_margin, title_y - 88, f"Level: {cover_level}")
+    cover.drawString(left_margin, title_y - 124, f"Subject Code: {cover_subject_code}")
 
     cover.showPage()
     cover.save()
@@ -188,8 +190,6 @@ subject_code = subjects[subject_name]
 st.info(f"Selected: **{subject_name}**  |  Code: `{subject_code}`")
 
 alias_name = ""
-if len(subject_name) > 16:
-    alias_name = st.text_input("Alias for Cover (Short Name)")
 
 current_year = int(datetime.now().year)
 col1, col2 = st.columns(2)
@@ -200,7 +200,9 @@ with col1:
 with col2:
     year_end = st.number_input("End Year", 2002, current_year, current_year)
 
-sessions = st.multiselect("Select Sessions", ["m", "s", "w"], default=["m", "s", "w"])
+session_labels = list(SESSION_OPTIONS.keys())
+selected_session_labels = st.multiselect("Select Sessions", session_labels, default=session_labels)
+sessions = [SESSION_OPTIONS[label] for label in selected_session_labels]
 
 
 paper_type = st.selectbox(
@@ -224,10 +226,6 @@ def format_papers(text):
 
 paper_input = format_papers(paper_input_raw)
 paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
-
-
-st.markdown("### Optional: Upload a Cover Image (PNG)")
-cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
 
 
 def download_paper(args):
@@ -271,13 +269,7 @@ if st.button("Download & Merge Papers"):
         gt_downloads = []
         downloaded, failed = [], []
 
-        uploaded_cover_path = None
-        if cover_image is not None:
-            uploaded_cover_path = os.path.join(os.getcwd(), "uploaded_cover.png")
-            with open(uploaded_cover_path, "wb") as f:
-                f.write(cover_image.read())
-
-        background_path = uploaded_cover_path if uploaded_cover_path else DEFAULT_TEMPLATE_PATH
+        background_path = DEFAULT_TEMPLATE_PATH
 
         st.write("### Download Progress:")
         status_placeholder = st.empty()
