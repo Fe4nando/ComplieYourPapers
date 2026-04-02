@@ -141,7 +141,7 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     title, subtitle = build_cover_title(subject_name, alias_name, paper_type_short, paper_no)
     cover.setFillColor(HexColor("#0A1D4E"))
-    cover.roundRect(45, 85, page_width - 90, 180, fill=1, stroke=0)
+    cover.roundRect(45, 85, page_width - 90, 180, 18, fill=1, stroke=0)
 
     cover.setFillColor(white)
     cover.setFont(COVER_FONT_NAME, 26)
@@ -392,3 +392,18 @@ st.markdown("""
         © 2026 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
