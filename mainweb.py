@@ -107,7 +107,16 @@ COVER_FONT_NAME = register_cover_font()
 
 def build_cover_title(subject_name, alias_name, paper_type_short, paper_no):
     display_name = alias_name.strip() if alias_name.strip() else subject_name
-    subtitle = "Grade Thresholds" if paper_type_short == "gt" else f"{paper_type_short.upper()} Paper {paper_no}"
+    if paper_type_short == "gt":
+        subtitle = "Grade Thresholds"
+    else:
+        paper_labels = {
+            "qp": "Question Paper",
+            "ms": "Mark Scheme",
+            "in": "Insert",
+        }
+        paper_label = paper_labels.get(paper_type_short, paper_type_short.upper())
+        subtitle = f"{paper_label} {paper_no}"
     return display_name, subtitle
 
 
@@ -144,22 +153,23 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     # Position generated text inside the large white content box from the template.
     left_margin = 78
-    text_top = 590
-    line_gap = 34
+    text_top = 620
+    line_gap = 36
 
     cover.setFillColor(HexColor("#000000"))
     cover.setFont(COVER_FONT_NAME, 32)
     cover.drawString(left_margin, text_top, title[:34])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 21)
+    cover.setFont(COVER_FONT_NAME, 20)
     cover.drawString(left_margin, text_top - line_gap, subtitle)
 
-    cover.setFont(COVER_FONT_NAME, 17)
-    cover.drawString(left_margin, text_top - (line_gap * 2), f"{level} | Subject Code: {subject_code}")
+    cover.setFont(COVER_FONT_NAME, 15)
+    cover.drawString(left_margin, text_top - (line_gap * 2), f"Level: {level}")
+    cover.drawString(left_margin, text_top - (line_gap * 2.8), f"Subject Code: {subject_code}")
 
-    cover.setFont(COVER_FONT_NAME, 14)
-    cover.drawString(left_margin, text_top - (line_gap * 3), f"Generated on {datetime.now().strftime('%d %b %Y')}")
+    cover.setFont(COVER_FONT_NAME, 13)
+    cover.drawString(left_margin, text_top - (line_gap * 3.9), f"Generated on {datetime.now().strftime('%d %b %Y')}")
 
     cover.showPage()
     cover.save()
