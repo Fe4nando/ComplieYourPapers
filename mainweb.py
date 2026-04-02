@@ -141,21 +141,25 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
     cover.drawImage(ImageReader(background_path), x, y, width=draw_width, height=draw_height, preserveAspectRatio=True)
 
     title, subtitle = build_cover_title(subject_name, alias_name, paper_type_short, paper_no)
+
+    # Position generated text inside the large white content box from the template.
+    left_margin = 78
+    text_top = 560
+    line_gap = 30
+
     cover.setFillColor(HexColor("#0A1D4E"))
-    cover.roundRect(55, 110, page_width - 110, 145, 18, fill=1, stroke=0)
+    cover.setFont(COVER_FONT_NAME, 28)
+    cover.drawString(left_margin, text_top, title[:34])
 
-    cover.setFillColor(white)
-    cover.setFont(COVER_FONT_NAME, 24)
-    cover.drawString(75, 220, title[:38])
-
+    cover.setFillColor(HexColor("#1F1F1F"))
     cover.setFont(COVER_FONT_NAME, 18)
-    cover.drawString(75, 190, subtitle)
+    cover.drawString(left_margin, text_top - line_gap, subtitle)
 
-    cover.setFont(COVER_FONT_NAME, 14)
-    cover.drawString(75, 162, f"{level} | Subject Code: {subject_code}")
+    cover.setFont(COVER_FONT_NAME, 15)
+    cover.drawString(left_margin, text_top - (line_gap * 2), f"{level} | Subject Code: {subject_code}")
 
-    cover.setFont(COVER_FONT_NAME, 11)
-    cover.drawString(75, 138, f"Generated on {datetime.now().strftime('%d %b %Y')}")
+    cover.setFont(COVER_FONT_NAME, 12)
+    cover.drawString(left_margin, text_top - (line_gap * 3), f"Generated on {datetime.now().strftime('%d %b %Y')}")
 
     cover.showPage()
     cover.save()
