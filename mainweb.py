@@ -164,7 +164,7 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     left_margin = 78
     title_y = 620
-    line_gap = 64
+    line_gap = 56
 
     cover.setFillColor(HexColor("#000000"))
     cover.setFont(COVER_FONT_NAME, 32)
