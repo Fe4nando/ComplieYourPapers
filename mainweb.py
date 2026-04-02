@@ -69,6 +69,7 @@ if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, "w") as f:
         json.dump({"total_downloads": 0, "logs": []}, f, indent=4)
 
+
 def update_data_log(level, subject_name, subject_code, num_papers, success_count, fail_count):
     with open(DATA_FILE, "r") as f:
         data = json.load(f)
@@ -141,26 +142,25 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
 
     title, subtitle = build_cover_title(subject_name, alias_name, paper_type_short, paper_no)
     cover.setFillColor(HexColor("#0A1D4E"))
-    cover.roundRect(45, 85, page_width - 90, 180, 18, fill=1, stroke=0)
+    cover.roundRect(55, 110, page_width - 110, 145, 18, fill=1, stroke=0)
 
     cover.setFillColor(white)
-    cover.setFont(COVER_FONT_NAME, 26)
-    cover.drawString(65, 220, title[:38])
+    cover.setFont(COVER_FONT_NAME, 24)
+    cover.drawString(75, 220, title[:38])
 
     cover.setFont(COVER_FONT_NAME, 18)
-    cover.drawString(65, 190, subtitle)
+    cover.drawString(75, 190, subtitle)
 
     cover.setFont(COVER_FONT_NAME, 14)
-    cover.drawString(65, 160, f"{level} | Subject Code: {subject_code}")
+    cover.drawString(75, 162, f"{level} | Subject Code: {subject_code}")
 
-    cover.setFont(COVER_FONT_NAME, 12)
-    cover.drawString(65, 135, f"Generated on {datetime.now().strftime('%d %b %Y')}")
+    cover.setFont(COVER_FONT_NAME, 11)
+    cover.drawString(75, 138, f"Generated on {datetime.now().strftime('%d %b %Y')}")
 
     cover.showPage()
     cover.save()
     packet.seek(0)
     return packet
-
 
 
 level_choice = st.radio("Select Level:", ["IGCSE", "A Level"], horizontal=True)
@@ -173,7 +173,7 @@ st.info(f"Selected: **{subject_name}**  |  Code: `{subject_code}`")
 
 alias_name = ""
 if len(subject_name) > 16:
-    alias_name = st.text_input("✏️ Alias for Cover (Short Name)")
+    alias_name = st.text_input("Alias for Cover (Short Name)")
 
 current_year = int(datetime.now().year)
 col1, col2 = st.columns(2)
@@ -199,10 +199,12 @@ if paper_type_short != "gt":
 else:
     paper_input_raw = ""
 
+
 def format_papers(text):
     cleaned = re.sub(r"\D", "", text)
     groups = [cleaned[i:i+2] for i in range(0, len(cleaned), 2)]
     return " ".join([g for g in groups if g])
+
 
 paper_input = format_papers(paper_input_raw)
 paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
@@ -210,7 +212,6 @@ paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
 
 st.markdown("### Optional: Upload a Cover Image (PNG)")
 cover_image = st.file_uploader("Upload PNG Cover", type=["png"])
-
 
 
 def download_paper(args):
@@ -229,12 +230,11 @@ def download_paper(args):
             return paper_no, filename, BytesIO(r.content)
         else:
             return paper_no, filename, None
-    except:
+    except Exception:
         return paper_no, filename, None
 
 
-
-if st.button("⚡ Download & Merge Papers"):
+if st.button("Download & Merge Papers"):
 
     if paper_type_short != "gt" and not paper_numbers:
         st.error("Please enter at least one paper number.")
@@ -263,7 +263,7 @@ if st.button("⚡ Download & Merge Papers"):
 
         background_path = uploaded_cover_path if uploaded_cover_path else DEFAULT_TEMPLATE_PATH
 
-        st.write("### 📥 Download Progress:")
+        st.write("### Download Progress:")
         status_placeholder = st.empty()
         progress = st.progress(0)
 
@@ -380,7 +380,7 @@ if st.button("⚡ Download & Merge Papers"):
         st.success(f"Downloaded {len(downloaded)} papers. {len(failed)} failed.")
 
         st.download_button(
-            "⬇️ Download All Merged Files (ZIP)",
+            "Download All Merged Files (ZIP)",
             output_zip.getvalue(),
             f"{level_choice}_{subject_code}_merged_papers.zip",
             "application/zip"
@@ -389,21 +389,6 @@ if st.button("⚡ Download & Merge Papers"):
 st.markdown("""
     <hr style="margin-top: 50px; border: none; height: 1px; background-color: #333;">
     <div style='text-align: center; font-size: 0.8rem; color: #888; padding-bottom: 20px;'>
-        © 2026 Paperport. All rights reserved. <br> Created by Fernando Gabriel Morera.
+        © 2026 PaperPort. All rights reserved. <br> Created by Fernando Gabriel Morera.
     </div>
 """, unsafe_allow_html=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
