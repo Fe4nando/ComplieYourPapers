@@ -3,7 +3,6 @@ import requests
 from PyPDF2 import PdfMerger
 from io import BytesIO
 import zipfile
-import base64
 import re
 import concurrent.futures
 from reportlab.pdfgen import canvas
@@ -16,7 +15,6 @@ from PIL import Image
 import os
 import json
 from datetime import datetime
-import streamlit.components.v1 as components
 
 LEVELS = st.secrets["LEVELS"]
 DOWNLOAD_DIR = st.secrets["DOWNLOAD_DIR"]
@@ -395,22 +393,24 @@ if st.button("Download & Merge Papers"):
 
         st.success(f"Downloaded {len(downloaded)} papers. {len(failed)} failed.")
         zip_filename = f"{level_choice}_{subject_code}_merged_papers.zip"
-        zip_b64 = base64.b64encode(output_zip.getvalue()).decode()
-        components.html(
-            f"""
+        st.download_button(
+            "Download ZIP",
+            output_zip.getvalue(),
+            file_name=zip_filename,
+            mime="application/zip",
+            key=f"download_{subject_code}_{paper_type_short}_{year_start}_{year_end}",
+        )
+        st.markdown(
+            """
             <script>
-            const link = document.createElement('a');
-            link.href = "data:application/zip;base64,{zip_b64}";
-            link.download = "{zip_filename}";
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            const buttons = window.parent.document.querySelectorAll('button[kind="secondary"]');
+            const target = Array.from(buttons).find(btn => btn.innerText.trim() === "Download ZIP");
+            if (target) {
+                target.click();
+            }
             </script>
-            <p style="font-family: sans-serif; color: #666; margin: 0;">
-                Your ZIP download should start automatically.
-            </p>
             """,
-            height=28,
+            unsafe_allow_html=True,
         )
 
 st.markdown("""
