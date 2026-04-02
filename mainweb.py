@@ -167,11 +167,11 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
     line_gap = 64
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 28)
+    cover.setFont(COVER_FONT_NAME, 32)
     cover.drawString(left_margin, title_y, heading[:24])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 36)
+    cover.setFont(COVER_FONT_NAME, 32)
     cover.drawString(left_margin, title_y - line_gap, title[:22])
 
     cover.setFont(COVER_FONT_NAME, 24)
