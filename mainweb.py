@@ -161,19 +161,20 @@ def create_cover_pdf(background_path, level, subject_name, alias_name, subject_c
     )
 
     left_margin = 78
-    title_y = 548
+    title_y = 560
+    line_gap = 40
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 30)
+    cover.setFont(COVER_FONT_NAME, 32)
     cover.drawString(left_margin, title_y, title[:24])
 
     cover.setFillColor(HexColor("#000000"))
-    cover.setFont(COVER_FONT_NAME, 20)
-    cover.drawString(left_margin, title_y - 42, paper_line[:28])
+    cover.setFont(COVER_FONT_NAME, 22)
+    cover.drawString(left_margin, title_y - line_gap, paper_line[:28])
 
-    cover.setFont(COVER_FONT_NAME, 14)
-    cover.drawString(left_margin, title_y - 88, f"Level: {cover_level}")
-    cover.drawString(left_margin, title_y - 124, f"Subject Code: {cover_subject_code}")
+    cover.setFont(COVER_FONT_NAME, 16)
+    cover.drawString(left_margin, title_y - (line_gap * 2), f"Level: {cover_level}")
+    cover.drawString(left_margin, title_y - (line_gap * 2.8), f"Subject Code: {cover_subject_code}")
 
     cover.showPage()
     cover.save()
