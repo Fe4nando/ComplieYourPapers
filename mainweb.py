@@ -10,10 +10,9 @@ from io import BytesIO
 
 import requests
 import streamlit as st
-import streamlit.components.v1 as components
 from PIL import Image
 from PyPDF2 import PdfMerger
-from reportlab.lib.colors import HexColor, white
+from reportlab.lib.colors import white
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfbase import pdfmetrics
@@ -21,7 +20,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
 
-st.set_page_config(page_title="PaperPort Public", layout="wide")
+st.set_page_config(page_title="GMAK Paper Port", layout="wide")
 
 LEVELS = st.secrets["LEVELS"]
 DOWNLOAD_DIR = st.secrets["DOWNLOAD_DIR"]
@@ -125,11 +124,11 @@ def register_cover_font():
 COVER_FONT_NAME = register_cover_font()
 
 
-@st.dialog("Welcome to PaperPort")
+@st.dialog("Welcome to GMAK Paper Port")
 def show_startup_popup():
     st.markdown(
         """
-**You are accessing the Custom School Past Paper Compiler.**
+**You are accessing GMAK Paper Port.**
 
 To proceed, verification is required.
 
@@ -183,15 +182,11 @@ Type your ID card number if you are a student, or your email address if you are 
         st.session_state["startup_popup_seen"] = True
         st.rerun()
 
-    if st.button("Use the General/Public Version of PaperPort", use_container_width=True):
-        components.html(
-            """
-<script>
-window.open("https://paperport.streamlit.app/", "_self");
-</script>
-""",
-            height=0,
-        )
+    st.link_button(
+        "Use the Public PaperPort Website",
+        "https://paperport.streamlit.app/",
+        use_container_width=True,
+    )
 
 
 def update_data_log(level, subject_name, subject_code, num_papers, success_count, fail_count):
@@ -428,11 +423,16 @@ def download_paper(args):
 
 
 def render_home_page():
+    logo_col, _ = st.columns([1, 5])
+    with logo_col:
+        if os.path.exists("logo.png"):
+            st.image("logo.png", width=140)
+
     st.markdown(
         """
 <div class="page-card">
-<h3 style="margin-top:0;">Public General Paper Compiler</h3>
-<p style="margin-bottom:0;">Download and merge CAIE papers with a public general cover design.</p>
+<h3 style="margin-top:0;">GMAK Paper Port</h3>
+<p style="margin-bottom:0;">Download and merge CAIE papers for GMAK in one place.</p>
 </div>
 """,
         unsafe_allow_html=True,
@@ -468,7 +468,7 @@ def render_home_page():
     paper_input = format_papers(paper_input_raw)
     paper_numbers = [p.strip() for p in paper_input.split() if p.strip()]
 
-    if st.button("Generate Public General Pack"):
+    if st.button("Generate GMAK Paper Pack"):
         st.session_state["public_general_zip_bytes"] = None
         st.session_state["public_general_zip_name"] = None
 
@@ -541,7 +541,7 @@ def render_home_page():
                 merger.close()
                 merged_pdf.seek(0)
                 zf.writestr(
-                    f"{level_choice}_{subject_code}_Grade_Thresholds_Public_General.pdf",
+                    f"{level_choice}_{subject_code}_Grade_Thresholds_GMAK.pdf",
                     merged_pdf.getvalue(),
                 )
             else:
@@ -564,7 +564,7 @@ def render_home_page():
                     merger.close()
                     merged_pdf.seek(0)
                     zf.writestr(
-                        f"{level_choice}_{subject_code}_Paper_{num}_Public_General.pdf",
+                        f"{level_choice}_{subject_code}_Paper_{num}_GMAK.pdf",
                         merged_pdf.getvalue(),
                     )
 
@@ -579,7 +579,7 @@ def render_home_page():
         )
 
         st.session_state["public_general_zip_bytes"] = output_zip.getvalue()
-        st.session_state["public_general_zip_name"] = f"{level_choice}_{subject_code}_public_general_pack.zip"
+        st.session_state["public_general_zip_name"] = f"{level_choice}_{subject_code}_gmak_paper_pack.zip"
         st.success(f"Downloaded {len(downloaded)} papers. {len(failed)} failed.")
 
     if st.session_state["public_general_zip_bytes"]:
@@ -588,13 +588,13 @@ def render_home_page():
             """
 <div class="download-card">
 <strong>Your ZIP is ready.</strong><br>
-Use the blue button below to download the generated public general pack.
+Use the blue button below to download the generated GMAK paper pack.
 </div>
 """,
             unsafe_allow_html=True,
         )
         st.download_button(
-            "Download Public General ZIP",
+            "Download GMAK Paper Pack",
             st.session_state["public_general_zip_bytes"],
             file_name=st.session_state["public_general_zip_name"],
             mime="application/zip",
@@ -603,104 +603,17 @@ Use the blue button below to download the generated public general pack.
         )
 
 
-
-def render_about_page():
-    st.markdown(
-        """
-<div class="page-card">
-<h3 style="margin-top:0;">About The Public General Version</h3>
-<p>This version is designed for general public use with a clean branded cover style and a simpler interface.</p>
-<ul>
-  <li>Friendly session labels for teachers</li>
-  <li>Public general cover generation</li>
-  <li>Automatic merging by paper number</li>
-  <li>ZIP export of final merged files</li>
-</ul>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-
-
-def render_request_page():
-    st.markdown(
-        """
-<div class="page-card">
-<h3 style="margin-top:0;">Request A Free Custom School Past Paper Merger</h3>
-<p>If your school wants a custom branded past paper merger, you can submit a request here for free.</p>
-</div>
-""",
-        unsafe_allow_html=True,
-    )
-    st.write("")
-
-    with st.form("school_request_form"):
-        school_name = st.text_input("School Name")
-        contact_name = st.text_input("Contact Person")
-        contact_email = st.text_input("Contact Email")
-        country = st.text_input("Country")
-        notes = st.text_area("What would you like in your custom school version?")
-        submitted = st.form_submit_button("Submit Request")
-
-    if submitted:
-        if not school_name or not contact_name or not contact_email:
-            st.error("Please fill in the school name, contact person, and contact email.")
-            return
-
-        payload = {
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "school_name": school_name,
-            "contact_name": contact_name,
-            "contact_email": contact_email,
-            "country": country,
-            "notes": notes,
-        }
-
-        save_school_request(payload)
-
-        try:
-            email_sent, email_error = send_school_request_notification(payload)
-        except Exception as exc:
-            email_sent, email_error = False, str(exc)
-
-        try:
-            confirmation_sent, confirmation_error = send_requester_confirmation_email(payload)
-        except Exception as exc:
-            confirmation_sent, confirmation_error = False, str(exc)
-
-        if email_sent and confirmation_sent:
-            st.success("Your request has been saved, emailed to the admin, and confirmed to the requester.")
-        elif email_sent:
-            st.warning(
-                f"Your request was saved and emailed to the admin, but the requester confirmation email was not sent. {confirmation_error}"
-            )
-        else:
-            st.warning(f"Your request was saved, but email notification was not sent. {email_error}")
-
-
-page = st.radio(
-    "Navigation",
-    ["Main Page", "About", "Request Custom School Version"],
-    horizontal=True,
-    label_visibility="collapsed",
-)
-
 if not st.session_state["startup_popup_seen"]:
     show_startup_popup()
 
-if page == "Main Page":
-    render_home_page()
-elif page == "About":
-    render_about_page()
-else:
-    render_request_page()
+render_home_page()
 
 
 st.markdown(
     """
 <hr style="margin-top: 50px; border: none; height: 1px; background-color: #333;">
 <div style='text-align: center; font-size: 0.8rem; color: #888; padding-bottom: 20px;'>
-© 2026 PaperPort Public General Version. All rights reserved. <br> Created by Fernando Gabriel Morera.
+&copy; 2026 GMAK Paper Port. All rights reserved. <br> Created by Fernando Gabriel Morera.
 </div>
 """,
     unsafe_allow_html=True,
