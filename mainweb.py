@@ -384,10 +384,10 @@ def create_public_cover_pdf(level, subject_name, subject_code, paper_type_short,
     )
 
     left_margin = 70
-    title_y = 560
+    title_y = 610
     line_gap = 64
 
-    cover.setFillColor(white)
+    cover.setFillColorRGB(0, 0, 0)
     cover.setFont(COVER_FONT_NAME, 30)
     cover.drawString(left_margin, title_y, heading[:24])
 
