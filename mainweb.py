@@ -39,7 +39,7 @@ ALEVEL_SUBJECTS = json.loads(st.secrets["ALEVEL_SUBJECTS"])
 DATA_FILE = "data.json"
 REQUESTS_FILE = "custom_school_requests.json"
 DEFAULT_FONT_PATH = "Poppins-Bold.ttf"
-GENERAL_COVER_PATH = "GENERAL_COVER.png"
+GENERAL_COVER_PATH = "template_base.png"
 
 SESSION_OPTIONS = {
     "FEB/MAR": "m",
