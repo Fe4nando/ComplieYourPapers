@@ -10,6 +10,7 @@ from io import BytesIO
 
 import requests
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
 from PyPDF2 import PdfMerger
 from reportlab.lib.colors import HexColor, white
@@ -143,7 +144,7 @@ Type your ID card number if you are a student, or your email address if you are 
     )
     st.session_state["access_verification_value"] = verification_value
 
-    if st.button("Use the General/Public Version of PaperPort", use_container_width=True):
+    if st.button("Verify School Access", use_container_width=True):
         cleaned_value = verification_value.strip()
 
         if not cleaned_value:
@@ -181,6 +182,16 @@ Type your ID card number if you are a student, or your email address if you are 
         st.session_state["access_verification_value"] = cleaned_value
         st.session_state["startup_popup_seen"] = True
         st.rerun()
+
+    if st.button("Use the General/Public Version of PaperPort", use_container_width=True):
+        components.html(
+            """
+<script>
+window.open("https://paperport.streamlit.app/", "_self");
+</script>
+""",
+            height=0,
+        )
 
 
 def update_data_log(level, subject_name, subject_code, num_papers, success_count, fail_count):
@@ -694,4 +705,3 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
-
