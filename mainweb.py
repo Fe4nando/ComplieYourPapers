@@ -54,22 +54,7 @@ PAPER_TYPE_OPTIONS = {
     "Grade Thresholds": "gt",
 }
 
-st.markdown(
-    """
-    <div style="
-        background:#fff3cd;
-        border:1px solid #ffe69c;
-        color:#664d03;
-        padding:15px;
-        border-radius:12px;
-        margin-bottom:20px;
-        font-weight:600;
-    ">
-    ⚠️ Temporary Outage Notice: Past papers from 2010–2026 are currently the only papers available while our paper providers undergo maintenance.
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+
 
 
 st.markdown(
@@ -519,6 +504,23 @@ def render_home_page():
     with logo_col:
         if os.path.exists("logo.png"):
             st.image("logo.png", width=140)
+
+st.markdown(
+    """
+    <div style="
+        background:#fff3cd;
+        border:1px solid #ffe69c;
+        color:#664d03;
+        padding:15px;
+        border-radius:12px;
+        margin-bottom:20px;
+        font-weight:600;
+    ">
+    ⚠️ Temporary Outage Notice: Past papers from 2010–2026 are currently the only papers available while our paper providers undergo maintenance.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
     st.markdown(
         """
