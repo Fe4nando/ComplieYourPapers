@@ -54,6 +54,23 @@ PAPER_TYPE_OPTIONS = {
     "Grade Thresholds": "gt",
 }
 
+st.markdown(
+    """
+    <div style="
+        background:#fff3cd;
+        border:1px solid #ffe69c;
+        color:#664d03;
+        padding:15px;
+        border-radius:12px;
+        margin-bottom:20px;
+        font-weight:600;
+    ">
+    ⚠️ Temporary Outage Notice: Past papers from 2010–2026 are currently the only papers available while our paper providers undergo maintenance.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 st.markdown(
     """
@@ -403,24 +420,99 @@ def create_public_cover_pdf(level, subject_name, subject_code, paper_type_short,
     return packet
 
 
+def _bestexamhelp_url(subject_code, year_suffix, filename):
+    if subject_code in ALEVEL_SUBJECTS.values():
+        level = "cambridge-international-a-level"
+
+        subject_name = next(
+            k for k, v in ALEVEL_SUBJECTS.items()
+            if v == subject_code
+        )
+
+    elif subject_code in IGCSE_SUBJECTS.values():
+        level = "cambridge-igcse"
+
+        subject_name = next(
+            k for k, v in IGCSE_SUBJECTS.items()
+            if v == subject_code
+        )
+
+    else:
+        return None
+
+    slug = (
+        subject_name.lower()
+        .replace("&", "and")
+        .replace("(9-1)", "")
+        .replace("(", "")
+        .replace(")", "")
+        .replace("/", "-")
+        .replace(" ", "-")
+        .strip("-")
+    )
+
+    return (
+        f"https://bestexamhelp.com/exam/"
+        f"{level}/"
+        f"{slug}-{subject_code}/"
+        f"20{int(year_suffix):02d}/"
+        f"{filename}"
+    )
+
+
 def download_paper(args):
     subject_code, session, year_suffix, paper_type_short, paper_no = args
 
     if paper_type_short == "gt":
         filename = f"{subject_code}_{session}{year_suffix}_gt.pdf"
     else:
-        filename = f"{subject_code}_{session}{year_suffix}_{paper_type_short}_{paper_no}.pdf"
+        filename = (
+            f"{subject_code}_{session}{year_suffix}_"
+            f"{paper_type_short}_{paper_no}.pdf"
+        )
 
-    url = f"https://pastpapers.papacambridge.com/directories/CAIE/CAIE-pastpapers/upload/{filename}"
+    url = _bestexamhelp_url(
+        subject_code,
+        year_suffix,
+        filename,
+    )
+
+    if not url:
+        print(f"Could not generate URL for {subject_code}")
+        return paper_no, filename, None
 
     try:
-        response = requests.get(url, headers=HEADERS, timeout=8)
-        if response.status_code == 200 and response.content.startswith(b"%PDF"):
-            return paper_no, filename, BytesIO(response.content)
-        return paper_no, filename, None
-    except Exception:
+        response = requests.get(
+            url,
+            headers=HEADERS,
+            timeout=15,
+            allow_redirects=True,
+        )
+
+        # Debug output
+        print("=" * 80)
+        print("URL:", url)
+        print("STATUS:", response.status_code)
+        print("FINAL URL:", response.url)
+        print("CONTENT TYPE:", response.headers.get("Content-Type"))
+        print("=" * 80)
+
+        if response.status_code != 200:
+            return paper_no, filename, None
+
+        content = response.content
+
+        # Verify it's actually a PDF
+        if b"%PDF" in content[:1024]:
+            return paper_no, filename, BytesIO(content)
+
+        print(f"Not a PDF: {url}")
         return paper_no, filename, None
 
+    except Exception as e:
+        print(f"Download failed: {url}")
+        print(e)
+        return paper_no, filename, None
 
 def render_home_page():
     logo_col, _ = st.columns([1, 5])
