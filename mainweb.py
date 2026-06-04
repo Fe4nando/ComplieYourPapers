@@ -521,8 +521,7 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-    st.markdown(
+st.markdown(
         """
 <div class="page-card">
 <h3 style="margin-top:0;">GMAK Paper Port</h3>
