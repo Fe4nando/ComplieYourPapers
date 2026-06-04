@@ -505,30 +505,30 @@ def render_home_page():
         if os.path.exists("logo.png"):
             st.image("logo.png", width=140)
 
-st.markdown(
-    """
-    <div style="
-        background:#fff3cd;
-        border:1px solid #ffe69c;
-        color:#664d03;
-        padding:15px;
-        border-radius:12px;
-        margin-bottom:20px;
-        font-weight:600;
-    ">
-    ⚠️ Temporary Outage Notice: Past papers from 2010–2026 are currently the only papers available while our paper providers undergo maintenance.
+    st.markdown(
+        """
+        <div style="
+            background:#fff3cd;
+            border:1px solid #ffe69c;
+            color:#664d03;
+            padding:15px;
+            border-radius:12px;
+            margin-bottom:20px;
+            font-weight:600;
+        ">
+        ⚠️ Temporary Outage Notice: Past papers from 2010–2026 are currently the only papers available while our paper providers undergo maintenance.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+            """
+    <div class="page-card">
+    <h3 style="margin-top:0;">GMAK Paper Port</h3>
+    <p style="margin-bottom:0;">Download and merge CAIE papers for GMAK in one place.</p>
     </div>
     """,
-    unsafe_allow_html=True,
-)
-st.markdown(
-        """
-<div class="page-card">
-<h3 style="margin-top:0;">GMAK Paper Port</h3>
-<p style="margin-bottom:0;">Download and merge CAIE papers for GMAK in one place.</p>
-</div>
-""",
-        unsafe_allow_html=True,
+            unsafe_allow_html=True,
     )
     st.write("")
 
